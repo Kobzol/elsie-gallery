@@ -2,8 +2,8 @@
 This repository serves as a demonstration showcase for [Elsie](https://github.com/spirali/elsie).
 
 Presentations:
-- [Rust](rust)
-- [CPU architecture effects](cpu-arch)
+- [Rust](rust/slides.pdf)
+- [CPU architecture effects](cpu-arch/slides.pdf)
 
 ## How to build
 ```bash
