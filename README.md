@@ -3,8 +3,7 @@ This repository serves as a demonstration showcase for [Elsie](https://github.co
 
 Presentations:
 - [Rust](rust)
-
-You can find the rendered slides [here](slides.pdf).
+- [CPU architecture effects](cpu-arch)
 
 ## How to build
 ```bash
