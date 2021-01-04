@@ -1,5 +1,5 @@
-# Elsie showcase
-This repository serves as a demonstration showcase for [Elsie](https://github.com/spirali/elsie).
+# Elsie gallery
+This repository serves as a gallery of presentations created with [Elsie](https://github.com/spirali/elsie).
 
 Presentations:
 - [Rust](rust/slides.pdf) [[sources](rust)]
@@ -9,6 +9,6 @@ Presentations:
 ## How to build
 ```bash
 $ cd <presentation-dir>
-$ pip install -r requirements.txt
-$ python slides.py
+$ pip3 install -r requirements.txt
+$ python3 slides.py
 ```
