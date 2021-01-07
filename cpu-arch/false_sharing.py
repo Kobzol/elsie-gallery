@@ -1,9 +1,9 @@
-from elsie import Slides
+from elsie import SlideDeck, TextStyle as s
 
 from utils import new_slide, slide_header, code, COLOR_BACKEND, bash
 
 
-def false_sharing(slides: Slides, backup: bool):
+def false_sharing(slides: SlideDeck, backup: bool):
     if backup:
         slide = new_slide(slides)
         content = slide_header(slide, "Code (backup)")
@@ -36,10 +36,10 @@ void thread_fn(int tid, double* data)
 
     slide = new_slide(slides)
     content = slide_header(slide, "How to measure?")
-    content.box().text("~tt{l2_rqsts.all_rfo}", style={"size": 48})
+    content.box().text("~tt{l2_rqsts.all_rfo}", s(size=48))
     content.box(p_top=20).text("How many times some core invalidated data in other cores?")
 
     if backup:
         bash(content.box(p_top=40, show="next+"), """$ perf stat -e l2_rqsts.all_rfo ./example3
 1 thread   ->        59 711
-2 threads  -> 1 112 258 710""", text_style={"align": "left"})
+2 threads  -> 1 112 258 710""", text_style=s(align="left"))

@@ -1,8 +1,7 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
-from elsie import Arrow, Slides
-from elsie.box import Box
-
+from elsie import Arrow, SlideDeck, TextStyle as s
+from elsie.boxtree.box import Box
 
 CODE_HIGHLIGHT_COLOR = "#FAAFAA"
 CODE_HIDDEN_COLOR = "#BBBBBB"
@@ -11,15 +10,15 @@ COLOR_BACKEND = "#001DB6"
 COLOR_FRONTEND = "#FF0000"
 
 
-def new_slides(width: int, height: int) -> Slides:
-    return Slides(width=width, height=height)
+def new_slides(width: int, height: int) -> SlideDeck:
+    return SlideDeck(width=width, height=height)
 
 
-def new_slide(slides: Slides):
+def new_slide(slides: SlideDeck):
     return slides.new_slide()
 
 
-def finish_slides(slides: Slides):
+def finish_slides(slides: SlideDeck):
     count = sum(slide.steps() for slide in slides._slides)
     size = 50
     x_end = 1220
@@ -32,18 +31,19 @@ def finish_slides(slides: Slides):
         for step in range(steps):
             progress = (total_steps + step) / count
             x = x_start - progress * x_diff
-            slide.box().box(show=step + 1, x=x, y=670, width=size, height=size).image("images/ferris.svg")
+            slide.box().box(show=step + 1, x=x, y=670, width=size, height=size).image(
+                "images/ferris.svg")
         total_steps += steps
 
 
 def slide_header(box: Box, text: str, return_header=False) -> Union[Box, Tuple[Box, Box]]:
     header = box.box(width="fill", height="10%").rect(bg_color="#23363A")
     row = header.box(horizontal=True)
-    row.box().text(text, style={
-        "size": 40,
-        "bold": True,
-        "color": "#FFFFFF"
-    })
+    row.box().text(text, style=s(
+        size=40,
+        bold=True,
+        color="#FFFFFF"
+    ))
 
     content = box.box(height="fill", width="fill")
     if return_header:
@@ -73,12 +73,12 @@ def with_bg(parent: Box, bg_color="#DDDDDD") -> Box:
 
 def bash(parent: Box, code: str, text_style=None, **box_args):
     if text_style is None:
-        text_style = {}
+        text_style = s()
 
-    text_style.update({
-        "color": "#E9E9ED",
-        "font": "monospace",
-    })
+    text_style = text_style.compose(s(
+        color="#E9E9ED",
+        font="monospace"
+    ))
 
     wrapper = parent.box(**box_args)
     wrapper.rect(bg_color="#3F3F3F")

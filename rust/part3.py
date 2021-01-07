@@ -1,14 +1,13 @@
-from elsie import Slides, Arrow
+from elsie import Arrow, Slides, TextStyle as s
 
-from part1 import bash
-from utils import slide_header, list_item, code, with_bg, CODE_HIGHLIGHT_COLOR, pointer_to_line, \
-    code_step
+from utils import CODE_HIGHLIGHT_COLOR, code, code_step, list_item, pointer_to_line, slide_header, \
+    with_bg
 
 
 def intro_slide(slides: Slides):
     slide = slides.new_slide()
-    slide.derive_style("default", "text", size=60, bold=True)
-    slide.derive_style("text", "orange", color="orange")
+    slide.set_style("text", s(size=60, bold=True))
+    slide.set_style("orange", slide.get_style("text").compose(s(color="orange")))
 
     safe = slide.box()
     safe.text("Fast & ~orange{Safe}", style="text")
@@ -18,9 +17,7 @@ def intro_slide(slides: Slides):
     line = slide.box(width="fill", horizontal=True)
     development = line.box(width="50%", y=0)
     development.overlay(show="2-3").text("Memory safety")
-    development.overlay(show="4").text("Memory safety", style={
-        "color": "orange"
-    })
+    development.overlay(show="4").text("Memory safety", style=s(color="orange"))
     performance = line.box(width="50%", y=0, show="3+")
     performance.text("Fearless concurrency")
 
@@ -33,7 +30,7 @@ def intro_slide(slides: Slides):
 
 def rust_safety(slides: Slides):
     slide = slides.new_slide()
-    slide.derive_style("default", "text", size=60, bold=True)
+    slide.set_style("text", s(size=60, bold=True))
 
     slide.box().text("Rust is safe...", style="text")
     slide.box(show="2+").text("...but from what?", style="text")
@@ -49,7 +46,7 @@ def rust_safety(slides: Slides):
 collection is modified while the iteration is in progress in any way
 other than by calling this method, unless an overriding class has specified
 a concurrent modification policy.”
-""", style={"size": 28, "align": "left"})
+""", style=s(size=28, align="left"))
 
     slide = slides.new_slide()
     content = slide_header(slide, "UB in Python")
@@ -58,7 +55,7 @@ a concurrent modification policy.”
 occur for mutable sequences, e.g. lists). An internal counter is used to keep track
 of which item ... ~emph{This can lead to nasty bugs} that can be avoided by making a
 temporary copy using a slice of the whole sequence ...”
-""", style={"size": 24, "align": "left"})
+""", style=s(size=24, align="left"))
 
     slide = slides.new_slide()
     content = slide_header(slide, "Sources of UB")
@@ -78,32 +75,32 @@ temporary copy using a slice of the whole sequence ...”
         list_item(list, show="next+").text(item)
 
     content.box(height=20)
-    content.box(show="next+").text("Rust tries very hard to avoid all of the above", style={
-        "size": 44,
-        "bold": True
-    })
+    content.box(show="next+").text("Rust tries very hard to avoid all of the above", style=s(
+        size=44,
+        bold=True
+    ))
 
 
 def cpp_alias_mutate(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("default", size=50, bold=True)
+    slide.update_style("default", s(size=50, bold=True))
     content = slide_header(slide, "Rust's insight")
     content.box(show="next+").text("""Memory errors arise when
 aliasing is combined with mutability""")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
-    slide.derive_style("code", "gray", color="#BBBBBB")
+    slide.update_style("code", s(size=32))
+    slide.set_style("gray", slide.get_style("code").compose(s(color="#BBBBBB")))
     content = slide_header(slide, "C++ UB example")
 
-    style_green = {
-        "size": 40,
-        "color": "green"
-    }
-    style_red = {
-        "size": style_green["size"],
-        "color": "red"
-    }
+    style_green = s(
+        size=40,
+        color="green"
+    )
+    style_red = s(
+        size=style_green.size,
+        color="red"
+    )
 
     header = content.box(width=500, height=50, horizontal=True)
     header.overlay(show="2").text("Aliasing ✓", style=style_green)
@@ -132,10 +129,10 @@ std::cout << p << std::endl;
     slide = slides.new_slide()
     content = slide_header(slide, "Rust's solution")
 
-    large = {
-        "size": 50,
-        "bold": True
-    }
+    large = s(
+        size=50,
+        bold=True
+    )
 
     row = content.box(horizontal=True)
     row.box().text("You can mutate", style=large)
@@ -160,17 +157,14 @@ def ownership(slides: Slides):
 
     slide = slides.new_slide()
     content = slide_header(slide, "Ownership")
-    content.box().text("Every value in Rust has exactly one owner", style={
-        "size": 50
-    })
+    content.box().text("Every value in Rust has exactly one owner", s(size=50))
     content.box(height=10)
-    content.box(show="next+").text("When that owner goes out of scope, the value is dropped", style={
-        "size": 36
-    })
+    content.box(show="next+").text("When that owner goes out of scope, the value is dropped",
+                                   style=s(size=36))
 
     def person_slide(end=""):
         slide = slides.new_slide()
-        slide.update_style("code", size=50)
+        slide.update_style("code", s(size=50))
         content = slide_header(slide, "Ownership")
         return (slide, code(content, """
 fn foo(bitmap: Bitmap) {{
@@ -181,12 +175,12 @@ fn foo(bitmap: Bitmap) {{
     pointer_to_line(slide, box, 0, 100, 150, "2+",
                     textbox_pos=("50%", "100%"),
                     code_pos=("40%", "10%")).text("""No one else has any access to `bitmap`.
-It can be mutated arbitrarily.""", style={"color": "orange", "size": 40})
+It can be mutated arbitrarily.""", style=s(color="orange", size=40))
 
     person_slide(" // bitmap is dropped here")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Ownership - move semantics")
     code_box = code(content.box(), """
 fn foo(bitmap: Bitmap) { ... }
@@ -201,10 +195,10 @@ fn main() {
                     textbox_pos=("40%", "100%"),
                     code_pos=("46%", "60%")).text("""`bitmap` is moved here.
 It will not be `dropped` in the current scope.
-""", style={"color": "orange", "align": "left"})
+""", style=s(color="orange", align="left"))
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Ownership - move semantics")
     code(content.box(), """
 fn foo(bitmap: Bitmap) { ... }
@@ -229,7 +223,7 @@ fn main() {
     content.box(height=600).image("imgs/meme-lvalue.jpg")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Why are they needed in C++?")
     box = code(content, """
 void foo(Bitmap&& bitmap) { ... }
@@ -241,13 +235,13 @@ std::cout << bitmap.width << std::endl;""", "cpp")
                     textbox_pos=("40%", "0"),
                     code_pos=("40%", "100%")).text("""`bitmap` is still accessible here.
 It will be `dropped` at the end of scope.
-Its state HAD to be reset in the move constructor.""", style={"color": "orange", "align": "left"})
+Its state HAD to be reset in the move constructor.""", style=s(color="orange", align="left"))
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, '"Copy" semantics')
     content.box().text("""Values are copied instead of moved
-if they implement the `Copy` trait""", style={"bold": True})
+if they implement the `Copy` trait""", style=s(bold=True))
 
     content.box(height=20)
     content.box(show="next+").text("Types are `Copy` if:")
@@ -264,7 +258,7 @@ struct Person {
 }""", width=500)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, '"Copy" semantics')
     box = code(content.box(), """
 fn foo(num: u32) { ... }
@@ -276,7 +270,7 @@ println!("{}", number); // no error""")
     pointer_to_line(slide, box, 3, 200, 600, "2+",
                     textbox_pos=("40%", "0"),
                     code_pos=("34%", "60%")).text("""`number` is copied here.
-    It can be still accessed after the call.""", style={"color": "orange"})
+    It can be still accessed after the call.""", style=s(color="orange"))
 
 
 def borrowing(slides: Slides):
@@ -295,7 +289,7 @@ def borrowing(slides: Slides):
     content.box(show="next+").text("This is called borrowing in Rust")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Shared borrows")
 
     code_width = 800
@@ -323,7 +317,7 @@ fn foo(bitmap: Bitmap) { }
 foo(a); // does not compile""", width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Unique borrows")
 
     code_width = 800
@@ -336,7 +330,7 @@ let c = &mut value;
     content.box(height=20)
     list = content.box()
     list_item(list, show="next+").text("""If a unique borrow exists, there are no other references
-to the same value""", style={"align": "left"})
+to the same value""", style=s(align="left"))
     list_item(list, show="next+").text("You can only create a unique borrow if you own the value")
 
     list.box(height=10)
@@ -352,7 +346,7 @@ fn foo(bitmap: Bitmap) { }
 foo(c); // does not compile""", width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Vector example (Rust)")
 
     code_width = 800
@@ -377,7 +371,7 @@ println!("{}", p);
     content.box(height=220, show="next+").image("imgs/borrowck-error.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     content = slide_header(slide, "What if compile time is not enough?")
     content.box().text("""If you can't prove to the compiler that your borrows are safe,
 borrow checking can be done at runtime.""")
@@ -391,13 +385,13 @@ let b = value.borrow_mut(); // unique borrow""")
     pointer_to_line(slide, code_box, 2, 100, 600, "4+",
                     textbox_pos=("40%", 0),
                     code_pos=("40%", "100%")).text("""This would panic, since there already is
-a shared borrow""", style={"color": "orange", "align": "left"})
+a shared borrow""", style=s(color="orange", align="left"))
 
 
 def lifetimes(slides: Slides):
     def cpp_lifetime(comment=""):
         slide = slides.new_slide()
-        slide.update_style("code", size=38)
+        slide.update_style("code", s(size=38))
         content = slide_header(slide, "Lifetimes (C++)")
         code(content, """
 int* p;
@@ -412,7 +406,7 @@ std::cout << *p << std::endl;
     cpp_lifetime(" // <-- `value` is destroyed here")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Lifetimes (Rust)")
     code_box = code(content.box(), """
 let p;
@@ -439,20 +433,20 @@ println!("{}", *p);""", width=800)
 
     content.box(height=20)
     content.box(width=500, show="2+").text("Lifetime of reference `p`",
-                                           style={"color": "orange", "align": "left"})
+                                           style=s(color="orange", align="left"))
     line(0, 5, "40%", "100%", "90%", 200, "orange", "2+")
 
     content.box(height=10)
     content.box(width=500, show="3+").text("Lifetime of `value`",
-                                           style={"color": "green", "align": "left"})
+                                           style=s(color="green", align="left"))
     line(2, 4, "100%", "10%", "100%", 50, "green", "3+")
 
     content.box(height=30)
     content.box(show="4+").text("""Lifetime of a value must be
->= lifetime of a reference to it""", style={"size": 50})
+>= lifetime of a reference to it""", style=s(size=50))
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Lifetimes (Rust)")
     code_box = code(content.box(), """
 let p;
@@ -466,7 +460,7 @@ println!("{}", *p);""", width=800)
     content.box(height=280).image("imgs/lifetime-error.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=36)
+    slide.update_style("code", s(size=32))
     content = slide_header(slide, "What if compile time is not enough?")
     content.box().text("""If you can't prove to the compiler that the lifetimes
 are correct, lifetime can be managed at runtime.""")

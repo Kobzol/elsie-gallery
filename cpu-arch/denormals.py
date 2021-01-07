@@ -1,10 +1,10 @@
-from elsie import Slides
-from elsie.box import Box
+from elsie import SlideDeck, TextStyle as s
+from elsie.boxtree.box import Box
 
 from utils import new_slide, slide_header, list_item, bash, code, COLOR_BACKEND, COLOR_FRONTEND
 
 
-def denormals(slides: Slides, backup: bool):
+def denormals(slides: SlideDeck, backup: bool):
     if backup:
         slide = new_slide(slides)
         content = slide_header(slide, "Code (backup)")
@@ -26,7 +26,7 @@ for (int r = 0; r < 100; r++)
     colors = ["#B22222", "#007944", "#0018AE"]
     styles = ["sign", "exponent", "significand"]
     for i, style in enumerate(styles):
-        slide.derive_style("default", style, color=colors[i], size=42)
+        slide.set_style(style, s(color=colors[i], size=42))
     content = slide_header(slide, "Denormal floating point numbers")
 
     row = content.box(horizontal=True)
@@ -36,7 +36,7 @@ for (int r = 0; r < 100; r++)
         for i in range(len(colors)):
             box = wrapper.box(width=box_dimension, height=box_dimension)
             box.rect(color="black", bg_color=colors[i], stroke_width=2)
-            box.text(str(values[i]), style={"color": "white", "bold": True})
+            box.text(str(values[i]), s(color="white", bold=True))
 
     floating_point(row, [colors[0]] + [colors[1]] * 5 + [colors[2]] * 10, [
         0,
@@ -53,7 +53,7 @@ for (int r = 0; r < 100; r++)
     list_item(list_wrapper, show="next+").text("Numbers close to zero")
     list_item(list_wrapper, show="last+").text("Hidden bit = 0, smaller bias")
 
-    content.box(p_top=40, show="next+").text("Operations on denormal numbers are slow!", style={"size": 46})
+    content.box(p_top=40, show="next+").text("Operations on denormal numbers are slow!", style=s(size=46))
 
     slide = new_slide(slides)
     content = slide_header(slide, "Floating point handling")
@@ -64,16 +64,16 @@ for (int r = 0; r < 100; r++)
 
     slide = new_slide(slides)
     content = slide_header(slide, "How to measure?")
-    content.box().text("~tt{fp_assist.any}", style={"size": 48})
+    content.box().text("~tt{fp_assist.any}", style=s(size=48))
     content.box(p_top=20).text("How many times the CPU switched to the microcode FP handler?")
 
     if backup:
         bash(content.box(p_top=40, show="next+"), """$ perf stat -e fp_assist.any ./example2
 0   ->          0
-0.3 -> 15 728 640""", text_style={"align": "left"})
+0.3 -> 15 728 640""", text_style=s(align="left"))
 
     slide = new_slide(slides)
-    slide.update_style("code", size=40)
+    slide.update_style("code", s(size=40))
     content = slide_header(slide, "How to fix it?")
     list_wrapper = content.box()
     list_item(list_wrapper).text("The nuclear option: ~tt{-ffast-math}")

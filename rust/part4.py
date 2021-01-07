@@ -1,13 +1,12 @@
-from elsie import Slides, Arrow
+from elsie import Arrow, Slides, TextStyle as s
 
-from utils import slide_header, list_item, code, bash, CODE_HIGHLIGHT_COLOR, code_step, \
-    with_border
+from utils import CODE_HIGHLIGHT_COLOR, bash, code, code_step, list_item, slide_header, with_border
 
 
 def intro_slide(slides: Slides):
     slide = slides.new_slide()
-    slide.derive_style("default", "text", size=60, bold=True)
-    slide.derive_style("text", "orange", color="orange")
+    slide.set_style("text", s(size=60, bold=True))
+    slide.set_style("orange", slide.get_style("text").compose(s(color="orange")))
 
     fast = slide.box()
     fast.text("Fast & ~orange{Safe}", style="text")
@@ -18,9 +17,7 @@ def intro_slide(slides: Slides):
     development = line.box(width="50%", y=0)
     development.overlay().text("Memory safety")
     performance = line.box(width="50%", y=0)
-    performance.text("Fearless concurrency", style={
-        "color": "orange"
-    })
+    performance.text("Fearless concurrency", style=s(color="orange"))
 
     arrow = Arrow(20)
     slide.box().line([fast.p("80%", "100%"), development.p("50%", 0)],
@@ -46,7 +43,7 @@ def concurrency_issues(slides: Slides):
     slide = slides.new_slide()
     content = slide_header(slide, "What causes data races?")
 
-    text_style = {"size": 50}
+    text_style = s(size=50)
     content.box(show="next+").text("Concurrent aliasing and mutability...", style=text_style)
     content.box(show="next+").text("...but Rust already disables that!", style=text_style)
 
@@ -56,7 +53,7 @@ def concurrency_issues(slides: Slides):
 
 def shared_state(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Spawning a thread")
 
     code(content.box(), "fn spawn<F: Fn + Send>(f: F)")
@@ -67,12 +64,12 @@ only if T implements the ~emph{Send} trait""")
 
     content.box(height=20)
     content.box(show="next+").text("""Send is implemented automatically, unless the type
-contains values that are not safe to be transferred between threads""", style={"size": 30})
+contains values that are not safe to be transferred between threads""", style=s(size=30))
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     content = slide_header(slide, "Shared state concurrency")
-    content.box().text("Goal:", style={"bold": True})
+    content.box().text("Goal:", style=s(bold=True))
     list = content.box()
     list_item(list, show="next+").text("Spawn a thread")
     list_item(list, show="next+").text("Send a reference to some value to it")
@@ -80,7 +77,7 @@ contains values that are not safe to be transferred between threads""", style={"
     list_item(list, show="next+").text("Read the value in the original thread")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     (content, header) = slide_header(slide, "Shared state concurrency", True)
     box = header.box(width=160, y=80)
     box.image("imgs/meme-face-1.jpg")
@@ -97,10 +94,10 @@ thread::spawn(|| {
          (0, 1, 2, 3, 4)], width=500)
 
     content.box(height=10)
-    with_border(content, show="4+").box(width=960, height=260).image("imgs/concurrent-error-1.png")
+    with_border(content, show="4+").box(height=220).image("imgs/concurrent-error-1.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     (content, header) = slide_header(slide, "Shared state concurrency", True)
     box = header.box(width=160, y=80)
     box.image("imgs/meme-face-2.jpg")
@@ -120,12 +117,12 @@ thread::spawn(|| {
 
     border_box = content.box(width=1000, height=220)
     box = with_border(border_box.overlay(), show="4").box(width=800, height=180)
-    box.box(show="4", width=1000, height=220).image("imgs/concurrent-error-2.png")
+    box.box(show="4", height=220).image("imgs/concurrent-error-2.png")
     box = with_border(border_box.overlay(), show="6+").box(width=800, height=180)
-    box.box(show="6+", width=1000, height=220).image("imgs/concurrent-error-3.png")
+    box.box(show="6+", width=900).image("imgs/concurrent-error-3.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     (content, header) = slide_header(slide, "Shared state concurrency", True)
     box = header.box(width=160, y=80)
     box.overlay(show="1-2").image("imgs/meme-face-6.jpg")
@@ -141,10 +138,11 @@ println!("{}", *p);
 """, 1, [(0, 1, 2, 3, None),
          (0, 1, 2, 3, 4),
          ], width=500)
-    with_border(content, show="3+").box(width=1000, height=340).image("imgs/concurrent-error-4.png")
+    with_border(content, show="3+").box(width=1000).image(
+        "imgs/concurrent-error-4.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     (content, header) = slide_header(slide, "Shared state concurrency", True)
     box = header.box(width=160, y=80, show="3+")
     box.image("imgs/meme-face-7.png")
@@ -168,8 +166,8 @@ Multiple variables remove aliasing.""")
     content.box(show="3+").text("Arc only provides ~emph{read-only} access (shared borrow).")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
-    slide.derive_style("code", "code2", size=32)
+    slide.update_style("code", s(size=34))
+    slide.set_style("code2", slide.get_style("code").compose(s(size=32)))
     content = slide_header(slide, "Shared state concurrency")
 
     code_width = 800
@@ -193,7 +191,7 @@ println!("{}", *p.lock());""", "1", (
 
 def message_passing(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Message passing")
 
     code_width = 900
@@ -212,12 +210,12 @@ let received = rx.recv();
 
     content.box(height=20)
     content.box(show="next+").text("""Splitting a channel into a receiver + sender removes aliasing
-    and allows moving the sender independently of the receiver.""", {"size": 34})
+    and allows moving the sender independently of the receiver.""", s(size=34))
 
 
 def unsafe(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=32)
+    slide.update_style("code", s(size=32))
     content = slide_header(slide, "Where's the catch?")
     content.box().text("We have seen things that mutate through a shared borrow")
 
@@ -235,7 +233,8 @@ fn store(&self, val: u64, order: Ordering);
         (0, 1, 2, 3, 4, 5)
     ], width=code_width)
 
-    content.box(show="5+").text("This is called ~tt{interior mutability} and requires unsafe Rust")
+    content.box(show="5+").text("This is called ~tt{interior mutability} and requires unsafe Rust",
+                                s(size=32))
 
     slide = slides.new_slide()
     content = slide_header(slide, "Enter unsafe Rust")
@@ -255,9 +254,9 @@ fn store(&self, val: u64, order: Ordering);
     content.box().text("You can mark parts of code with the ~tt{unsafe} keyword")
     content.box(show="next+").text("Unsafe Rust is a ~emph{superset} of Rust")
 
-    def unsafe_slide(header, code_body, content_show="1", code_size=46):
+    def unsafe_slide(header, code_body, content_show="1", code_size=36):
         slide = slides.new_slide()
-        slide.update_style("code", size=code_size)
+        slide.update_style("code", s(size=code_size))
         content = slide_header(slide, "Unsafe Rust")
         content.box(y=0).text("Unsafe Rust allows:")
 
@@ -289,7 +288,7 @@ unsafe impl Send for MySuperSafeType {
 }""")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=20)
+    slide.update_style("code", s(size=18))
     content = slide_header(slide, "Finding unsafe code - C++")
     code_box = code(content, """
 std::atomic<LifecycleId> ArenaImpl::lifecycle_id_generator_;
@@ -322,13 +321,11 @@ void ArenaImpl::Init() {
 
     slide = slides.new_slide()
     content = slide_header(slide, "Finding unsafe code - Rust")
-    bash(content.box(), '$ grep "unsafe" main.rs', text_style={
-        "size": 40
-    })
+    bash(content.box(), '$ grep "unsafe" main.rs', text_style=s(size=40))
 
     slide = slides.new_slide()
     slide.box().text("""Rust builds safe abstractions
-on top of unsafe foundations""", style={"size": 50})
+on top of unsafe foundations""", s(size=50))
 
 
 def fearless_concurrency(slides: Slides):

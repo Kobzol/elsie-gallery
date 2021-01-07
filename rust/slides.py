@@ -1,4 +1,4 @@
-from elsie import Slides
+from elsie import Slides, TextStyle as s
 
 from part1 import features
 from part2 import performance
@@ -11,16 +11,15 @@ COLOR2 = "#f74f00"
 
 slides = Slides()
 
-slides.update_style("default", font="Raleway-v4020", size=36, color=COLOR1)  # Default font
-slides.update_style("emph", color=COLOR2)     # Emphasis
-slides.derive_style("code", "code2", size=40, align="left")
+slides.update_style("default", s(font="Raleway-v4020", size=36, color=COLOR1))  # Default font
+slides.update_style("emph", s(color=COLOR2))     # Emphasis
+slides.set_style("code2", slides.get_style("code").compose(s(size=40, align="left")))
 
 
 def intro(slides: Slides):
     slide = slides.new_slide()
-    slide.new_style("title", size=60, bold=True)
-    slide.new_style("name", size=30)
-    slide.new_style("contact", size=15, color="gray")
+    slide.set_style("title", s(size=60, bold=True))
+    slide.set_style("name", s(size=30))
 
     slide.sbox(height="30%").image("imgs/logo.svg")
     slide.box(height=80)
@@ -45,10 +44,10 @@ reliable and efficient software.""")
 
 def outro(slides: Slides):
     slide = slides.new_slide()
-    slide.box().text("Thanks, our curse has finally been lifted", style={"size": 50})
+    slide.box().text("Thanks, our curse has finally been lifted", s(size=50))
     slide.box(height=20)
     slide.box(show="next+").text("Now YOU have to go and spread the word about Rust",
-                                 style={"size": 40})
+                                 s(size=40))
 
 
 intro(slides)

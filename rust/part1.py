@@ -1,12 +1,12 @@
-from elsie import Arrow, Slides
+from elsie import Arrow, Slides, TextStyle as s
 
-from utils import slide_header, list_item, code, CODE_HIGHLIGHT_COLOR, bash, code_step
+from utils import CODE_HIGHLIGHT_COLOR, bash, code, code_step, list_item, slide_header
 
 
 def intro_slide(slides: Slides):
     slide = slides.new_slide()
-    slide.derive_style("default", "text", size=60, bold=True)
-    slide.derive_style("text", "orange", color="orange")
+    slide.set_style("text", s(size=60, bold=True))
+    slide.set_style("orange", slide.get_style("text").compose(s(color="orange")))
 
     fast = slide.box()
     fast.text("~orange{Fast} & Safe", style="text")
@@ -16,9 +16,9 @@ def intro_slide(slides: Slides):
     line = slide.box(width="fill", horizontal=True)
     development = line.box(width="50%", y=0)
     development.overlay(show="2-3").text("Quick development")
-    development.overlay(show="4").text("Quick development", style={
-        "color": "orange"
-    })
+    development.overlay(show="4").text("Quick development", s(
+        color="orange"
+    ))
     performance = line.box(width="50%", y=0, show="3+")
     performance.text("High performance")
 
@@ -35,7 +35,7 @@ def project(slides: Slides):
     content.box(height=400).image("imgs/cargo.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=30))
 
     content = slide_header(slide, "Using libraries")
 
@@ -82,7 +82,7 @@ fn main() {
     def cargo_line(parent, text, code, show="1+", **text_args):
         wrapper = parent.box(width="fill", horizontal=True, show=show)
         textbox = wrapper.box(width="50%")
-        textbox.text(text, **text_args)
+        textbox = textbox.text(text, **text_args)
 
         codebox = wrapper.box(width="40%")
         bash(codebox, code, x=0, width="fill")
@@ -93,7 +93,7 @@ fn main() {
     cargo_line(wrapper, "Run", "$ cargo run", "2+")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=40)
+    slide.update_style("code", s(size=40))
     content = slide_header(slide, "Integrated tooling (tests)")
 
     code(content.box(), """
@@ -107,7 +107,7 @@ fn test_add() {
     bash(content.box(show="2+"), "$ cargo test")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=40)
+    slide.update_style("code", s(size=40))
     content = slide_header(slide, "Integrated tooling (benchmarks)")
 
     code(content.box(), """
@@ -130,7 +130,7 @@ fn bench_add_two(b: &mut Bencher) {
     box.line([box.p("53%", "55%"), box.p("73%", "55%")], stroke_width=3)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=24))
     content = slide_header(slide, "Build scripts")
     content.box().text("build.rs")
 
@@ -157,7 +157,7 @@ fn main() {
 
 def multiphase_compiler(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=34)
+    slide.update_style("code", s(size=34))
     content = slide_header(slide, "Multi-phase compiler")
 
     code(content.box(), """
@@ -171,8 +171,8 @@ fn look_ma_no_forward_declaration() { }
 
 def modules(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
-    slide.derive_style("default", "bold", bold=True)
+    slide.update_style("code", s(size=24))
+    slide.set_style("bold", s(bold=True))
     content = slide_header(slide, "Proper module system")
 
     line = content.box(width="fill", horizontal=True)
@@ -201,14 +201,14 @@ fn main() {
 
     content.box(height=60)
     advantages = content.box(show="3+")
-    advantages.update_style("default", size=40)
+    advantages.update_style("default", s(size=40))
     list_item(advantages).text("visibility control")
     list_item(advantages).text("self-contained")
 
 
 def structures(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=34)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, "Structures")
 
     code_width = 920
@@ -233,7 +233,7 @@ impl Person {
 
 def traits(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=32)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, "Traits")
 
     code_width = 960
@@ -261,7 +261,7 @@ impl Buffer for FileBuffer {
 """, width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=32)
+    slide.update_style("code", s(size=32))
     content = slide_header(slide, "Built-in traits")
     code(content.box(), """
 impl Display for Person {
@@ -289,7 +289,7 @@ let c: Matrix = matA + matB;
 
 def generics(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=30))
     content = slide_header(slide, "Generics")
 
     code_width = 900
@@ -325,7 +325,7 @@ impl <T: Display> Serialize for T {
 
 def adt(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=34)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, """Algebraic data types/tagged unions/sum types/
 discriminated unions/variants""")
 
@@ -338,7 +338,7 @@ enum Packet {
 }""", width=code_width)
 
     content.box(height=10)
-    content.box(show="next+").text("Pattern matching", style={"bold": True, "size": 40})
+    content.box(show="next+").text("Pattern matching", style=s(bold=True, size=40))
 
     code(content.box(show="last+"), """
 match socket.get_packet() {
@@ -353,7 +353,7 @@ match socket.get_packet() {
 
 def error_handling(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=24))
     content = slide_header(slide, "Error handling")
 
     code_width = 940
@@ -378,7 +378,7 @@ let index = match find_index(&[1, 2, 3], 4) {
 """, width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, "Error handling")
 
     code(content.box(), """
@@ -405,7 +405,7 @@ let item = match find_in_db(...) {
 """, width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=30))
     content = slide_header(slide, "Error handling")
     box = code(content.box(), """
 fn download(address: String) -> Result<Vec<u8>> {
@@ -433,7 +433,7 @@ let item = match value {
 
 def macros(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=26)
+    slide.update_style("code", s(size=22))
     content = slide_header(slide, "Macros")
 
     code_width = 920
@@ -447,7 +447,7 @@ macro_rules! find_min {
 """, "1", (
         (0, 1, None, None, None, 5),
         (0, 1, 2, 3, 4, 5)
-), width=code_width)
+    ), width=code_width)
     code(content.box(show="next+"), """
 find_min!(5);       // 5
 find_min!(2, 1, 3); // 1    
@@ -464,7 +464,7 @@ macro_rules! create_function {
 }""", width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=26)
+    slide.update_style("code", s(size=22))
     content = slide_header(slide, "Procedural macros")
 
     code_width = 920
@@ -482,7 +482,7 @@ struct Record {
 """, width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=26)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, "Procedural macros")
 
     code_width = 700
@@ -516,7 +516,7 @@ println!("{:?}", person);
 
 def qol(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=50)
+    slide.update_style("code", s(size=50))
     content = slide_header(slide, "Type inference")
 
     code_width = 900
@@ -533,7 +533,7 @@ vec.push(elem);
     ), width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=50)
+    slide.update_style("code", s(size=50))
     content = slide_header(slide, "Iterators")
 
     code_step(content.box(width=code_width, height=400), """
@@ -551,7 +551,7 @@ vec.iter()
     ), width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=40)
+    slide.update_style("code", s(size=32))
     content = slide_header(slide, "Generators")
 
     code(content.box(), """
@@ -570,7 +570,7 @@ let f = fibonacci().iter().take(5).collect();
 """)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=34)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, "Async/await")
 
     code(content.box(), """
@@ -586,21 +586,17 @@ async fn compute_job(job: Job) -> Result<Data, Error> {
 
 def design(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
     content = slide_header(slide, "Design by community")
 
     list = content.box()
     list_item(list).text("Open source")
     list_item(list).text("RFC")
-    list.box(width=900, height=300).image("imgs/rust-rfc.png")
+    list.box(width=700, height=200, p_top=40).image("imgs/rust-rfc.png")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
     content = slide_header(slide, "Backwards compatibility")
 
-    small = {
-        "size": 28
-    }
+    small = s(size=28)
 
     list = content.box()
     list_item(list).text("Strong BC guarantees")
@@ -611,7 +607,7 @@ def design(slides: Slides):
     list_item(list, show="3+", level=1).text("Rust 2015 vs Rust 2018", style=small)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Unstable features")
 
     code(content.box(), """

@@ -1,12 +1,12 @@
-from elsie import Slides, Arrow
+from elsie import Arrow, Slides, TextStyle as s
 
-from utils import slide_header, list_item, code, with_bg, CODE_HIGHLIGHT_COLOR
+from utils import CODE_HIGHLIGHT_COLOR, code, list_item, slide_header, with_bg
 
 
 def intro_slide(slides: Slides):
     slide = slides.new_slide()
-    slide.derive_style("default", "text", size=60, bold=True)
-    slide.derive_style("text", "orange", color="orange")
+    slide.set_style("text", s(size=60, bold=True))
+    slide.set_style("orange", slide.get_style("text"), s(color="orange"))
 
     fast = slide.box()
     fast.text("~orange{Fast} & Safe", style="text")
@@ -17,9 +17,7 @@ def intro_slide(slides: Slides):
     development = line.box(width="50%", y=0)
     development.overlay().text("Quick development")
     performance = line.box(width="50%", y=0)
-    performance.text("High performance", style={
-        "color": "orange"
-    })
+    performance.text("High performance", style=s(color="orange"))
 
     arrow = Arrow(20)
     slide.box().line([fast.p("15%", "100%"), development.p("50%", 0)],
@@ -31,9 +29,7 @@ def intro_slide(slides: Slides):
 def zero_cost(slides: Slides):
     slide = slides.new_slide()
     content = slide_header(slide, "Zero-cost abstractions")
-    content.box().text("Bjarne Stroustrup:", style={
-        "size": 60
-    })
+    content.box().text("Bjarne Stroustrup:", s(size=60))
 
     with_bg(content.box()).text("""What you don’t use, you don’t pay for.
 What you do use, you couldn’t hand code any better.""")
@@ -41,7 +37,7 @@ What you do use, you couldn’t hand code any better.""")
 
 def runtime(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("default", size=40)
+    slide.update_style("default", s(size=40))
     content = slide_header(slide, "Minimal runtime")
 
     list = content.box()
@@ -55,7 +51,7 @@ def runtime(slides: Slides):
 def llvm_iterator(slides: Slides):
     slide = slides.new_slide()
     content = slide_header(slide, "Compiles to LLVM")
-    content.box(width=500, height=600, x=300).image("imgs/llvm-flow.svg")
+    content.box(height=600, x=350).image("imgs/llvm-flow.svg")
 
     slide = slides.new_slide()
     content = slide_header(slide, "Compiles to LLVM")
@@ -73,7 +69,7 @@ def llvm_iterator(slides: Slides):
 
 def intrinsics(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
 
     content = slide_header(slide, "Branch prediction")
 
@@ -85,7 +81,7 @@ if core::intrinsic::likely(condition) {
 }""")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=34))
     content = slide_header(slide, "SIMD")
 
     code_width = 900
@@ -105,7 +101,7 @@ data.simd_iter()
     .scalar_collect();""", width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
     content = slide_header(slide, "Inline assembly")
 
     code(content.box(), """
@@ -122,7 +118,7 @@ fn add(a: i32, b: i32) -> i32 {
 
 def constexpr(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=38)
+    slide.update_style("code", s(size=38))
 
     content = slide_header(slide, "Constexpr functions")
 
@@ -147,7 +143,7 @@ def parallelization(slides: Slides):
     list_item(list, show="next+").text("Synchronized queues")
 
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=30))
     content = slide_header(slide, "Shared-memory parallelism")
     content.box().text("No OpenMP ☹")
 
@@ -168,7 +164,7 @@ fn sum_of_squares(input: &[i32]) -> i32 {
          .sum()
 }""", width=code_width)
     code_box.line_box(1, z_level=99,
-                      x=135, width=165, show="3+").rect(bg_color=CODE_HIGHLIGHT_COLOR)
+                      x=165, width=165, show="3+").rect(bg_color=CODE_HIGHLIGHT_COLOR)
 
     code(rayon.box(show="4+"), """
 #[parallel]
@@ -177,7 +173,7 @@ for x in 0..10 {
 }""", width=code_width)
 
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=26))
     content = slide_header(slide, "Message-passing")
     code(content, """
 let universe = mpi::initialize();
@@ -193,7 +189,7 @@ if rank == 0 {
 
 def c_interop(slides: Slides):
     slide = slides.new_slide()
-    slide.update_style("code", size=30)
+    slide.update_style("code", s(size=26))
 
     content = slide_header(slide, "C/C++ interop")
 
@@ -229,9 +225,7 @@ def caveats(slides: Slides):
     slide = slides.new_slide()
     content = slide_header(slide, "Performance caveats")
 
-    l1_style = {
-       "size": 26
-    }
+    l1_style = s(size=26)
 
     list = content.box()
     list_item(list).text("Out-of-bounds checks")
@@ -243,9 +237,9 @@ def caveats(slides: Slides):
 def benchmark_game(slides: Slides):
     slide = slides.new_slide()
     content = slide_header(slide, "Benchmark game")
-    content.box(width=1000, height=500).image("imgs/benchmark-game.png")
+    content.box(width=900).image("imgs/benchmark-game.png")
     content.box().text("https://benchmarksgame-team.pages.debian.net/benchmarksgame/fastest/gpp"
-                       "-rust.html", style={"size": 20})
+                       "-rust.html", style=s(size=20))
 
 
 def performance(slides: Slides):

@@ -1,10 +1,10 @@
-from elsie import Slides
-from elsie.box import Box
+from elsie import SlideDeck, TextStyle as s
+from elsie.boxtree.box import Box
 
-from utils import new_slide, slide_header, list_item, bash, code, COLOR_FRONTEND
+from utils import COLOR_FRONTEND, bash, code, list_item, new_slide, slide_header
 
 
-def branch_prediction(slides: Slides, backup: bool):
+def branch_prediction(slides: SlideDeck, backup: bool):
     if backup:
         slide = new_slide(slides)
         content = slide_header(slide, "Code (backup)")
@@ -40,7 +40,8 @@ for (auto x : data)
  3 159 530 915  cycles            #   3,701 GHz
  1 475 799 619  instructions      #   0,47  insn per cycle
    419 608 357  branches          # 491,533 M/sec
-   102 425 035  branch-misses     #  24,41% of all branches""", text_style={"align": "left", "size": 34})
+   102 425 035  branch-misses     #  24,41% of all branches""",
+         text_style=s(align="left", size=34))
 
     slide = new_slide(slides)
     content = slide_header(slide, "Branch predictor")
@@ -55,7 +56,8 @@ for (auto x : data)
     content = slide_header(slide, "Branch predictor")
     list_wrapper = content.box()
     list_item(list_wrapper).text("CPU tries to predict results of branches")
-    list_item(list_wrapper, show="next+").text("Misprediction can cost ~15-20 cycles!", escape_char="#")
+    list_item(list_wrapper, show="next+").text("Misprediction can cost ~15-20 cycles!",
+                                               escape_char="#")
 
     slide = new_slide(slides)
     content = slide_header(slide, "Simple branch predictor - unsorted array")
@@ -70,27 +72,33 @@ for (auto x : data)
         stroke_width = 2
         size = 36
         for i in range(len(numbers)):
-            box = row.box(width=box_dimension, height=box_dimension).rect(color="black", stroke_width=stroke_width)
+            box = row.box(width=box_dimension, height=box_dimension).rect(color="black",
+                                                                          stroke_width=stroke_width)
             number = str(numbers[i])
-            box.text(number, style={"bold": True, "size": size})
+            box.text(number, s(bold=True, size=size))
 
-            predicted_correctly = (predictions[i] and numbers[i] < needle) or (not predictions[i] and numbers[i] >= needle)
+            predicted_correctly = (predictions[i] and numbers[i] < needle) or (
+                        not predictions[i] and numbers[i] >= needle)
             prediction = "green" if predicted_correctly else "red"
             show_overlay = "{}+".format(start + i * 2 + 1)
-            overlay = box.overlay(show=show_overlay).rect(color="black", bg_color=prediction, stroke_width=stroke_width)
-            overlay.text(number, style={"color": "white", "bold": True, "size": size})
+            overlay = box.overlay(show=show_overlay).rect(color="black", bg_color=prediction,
+                                                          stroke_width=stroke_width)
+            overlay.text(number, s(color="white", bold=True, size=size))
             show_text = start + i * 2
-            row.box(x=i * box_dimension, y=box_dimension, width=box_dimension, show="{}-{}".format(show_text, show_text + 1)).text("{} < {}?".format(number, needle))
+            row.box(x=i * box_dimension, y=box_dimension, width=box_dimension,
+                    show="{}-{}".format(show_text, show_text + 1)).text(
+                "{} < {}?".format(number, needle))
 
     values = [6, 2, 1, 7, 4, 8, 3, 9]
-    text_style = {"align": "left", "size": 42}
+    text_style = s(align="left", size=42)
     width = 400
 
     def predict_sequence(wrapper: Box, values, start=1):
         for i in range(len(values)):
             value = "Taken" if values[i] else "Not taken"
             show_start = start + i * 2
-            wrapper.overlay(show="{}-{}".format(show_start, show_start + 1)).rect(bg_color="white").text("Prediction: {}".format(value), style=text_style)
+            wrapper.overlay(show="{}-{}".format(show_start, show_start + 1)).rect(
+                bg_color="white").text("Prediction: {}".format(value), style=text_style)
 
     def predict_value(index):
         if index == 0:
@@ -100,7 +108,8 @@ for (auto x : data)
     predictions = [predict_value(i) for i in range(len(values))]
 
     array(values, predictions, start=2)
-    prediction_wrapper = content.box(p_top=60, width=width).text("Prediction: Not taken", style=text_style)
+    prediction_wrapper = content.box(p_top=60, width=width).text("Prediction: Not taken",
+                                                                 style=text_style)
     predict_sequence(prediction_wrapper, predictions, start=1)
 
     content.box(show="next+", p_top=40).text("2 hits, 6 misses (25% hit rate)")
@@ -116,7 +125,8 @@ for (auto x : data)
     predictions = [predict_value(i) for i in range(len(values))]
 
     array(values, predictions, start=2)
-    prediction_wrapper = content.box(p_top=60, width=width).text("Prediction: Not taken", style=text_style)
+    prediction_wrapper = content.box(p_top=60, width=width).text("Prediction: Not taken",
+                                                                 style=text_style)
     predict_sequence(prediction_wrapper, predictions, start=1)
 
     content.box(show="next+", p_top=40).text("6 hits, 2 misses (75% hit rate)")
@@ -128,27 +138,29 @@ for (auto x : data)
         row = content.box(horizontal=True)
         row.box(y=0, p_right=50, width=400).image("images/bm-float-code.png")
         row.box(y=0, width=600).image("images/bm-float-bin.png")
-        content.box(p_top=20).text("With ~tt{float}, there are two branches per iteration", style={"size": size})
+        content.box(p_top=20).text("With ~tt{float}, there are two branches per iteration",
+                                   style=s(size=size))
 
         slide = new_slide(slides)
         content = slide_header(slide, "How can the compiler help?")
         row = content.box(horizontal=True)
         row.box(y=0, p_right=50, width=400).image("images/bm-int-code.png")
         row.box(y=0, width=600).image("images/bm-int-bin.png")
-        content.box(p_top=20).text("With ~tt{int}, one branch is removed (using ~tt{cmov})", style={"size": size})
+        content.box(p_top=20).text("With ~tt{int}, one branch is removed (using ~tt{cmov})",
+                                   style=s(size=size))
 
     slide = new_slide(slides)
     content = slide_header(slide, "How to measure?")
-    content.box().text("~tt{branch-misses}", style={"size": 48})
+    content.box().text("~tt{branch-misses}", style=s(size=48))
     content.box(p_top=20).text("How many times was a branch mispredicted?")
 
     if backup:
         bash(content.box(p_top=40, show="next+"), """$ perf stat -e branch-misses ./example0a
 with    sort ->     383 902
-without sort -> 101 652 009""", text_style={"align": "left"})
+without sort -> 101 652 009""", text_style=s(align="left"))
 
     slide = new_slide(slides)
-    slide.update_style("code", size=40)
+    slide.update_style("code", s(size=40))
     content = slide_header(slide, "How to help the branch predictor?")
     list_wrapper = content.box()
     list_item(list_wrapper).text("More predictable data")
@@ -169,8 +181,9 @@ without sort -> 101 652 009""", text_style={"align": "left"})
 
     if backup:
         slide = new_slide(slides)
+        slide.update_style("code", s(size=26))
         content = slide_header(slide, "Code (backup)")
-        code(content.box(), """struct A { virtual void handle(size_t* data) const = 0; };
+        code(content, """struct A { virtual void handle(size_t* data) const = 0; };
 struct B: public A { void handle(size_t* data) const final { *data += 1; } };
 struct C: public A { void handle(size_t* data) const final { *data += 2; } };
 
@@ -180,7 +193,7 @@ size_t sum = 0;
 for (auto& x : data)
 {
     x->handle(&sum);
-}""", p_right=10)
+}""")
 
         slide = new_slide(slides)
         content = slide_header(slide, "Result (backup)")
@@ -190,4 +203,4 @@ for (auto& x : data)
         content = slide_header(slide, "perf (backup)")
         bash(content.box(), """$ perf stat -e branch-misses ./example0b
 with sort   ->     337 274
-without sort -> 84 183 161""", text_style={"align": "left"})
+without sort -> 84 183 161""", text_style=s(align="left"))

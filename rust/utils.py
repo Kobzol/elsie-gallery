@@ -1,8 +1,8 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
-from elsie import Arrow
-from elsie.box import Box
-
+from elsie import Arrow, TextStyle as s
+from elsie.boxtree.box import Box
+from elsie.text.textboxitem import TextBoxItem
 
 CODE_HIGHLIGHT_COLOR = "#FAAFAA"
 CODE_HIDDEN_COLOR = "#BBBBBB"
@@ -11,10 +11,10 @@ CODE_HIDDEN_COLOR = "#BBBBBB"
 def slide_header(box: Box, text: str, return_header=False) -> Union[Box, Tuple[Box, Box]]:
     header = box.box(width="fill", height="10%")
     row = header.box(horizontal=True)
-    row.box().text(text, style={
-        "size": 40,
-        "bold": True
-    })
+    row.box().text(text, style=s(
+        size=40,
+        bold=True
+    ))
 
     content = box.box(height="fill", width="fill")
     if return_header:
@@ -28,12 +28,11 @@ def list_item(parent, level=0, **box_args) -> Box:
     return b.box(width="fill")
 
 
-def code(parent: Box, code: str, language="rust", width=None, code_style="code") -> Box:
+def code(parent: Box, code: str, language="rust", width=None, code_style="code") -> TextBoxItem:
     content = parent.box(width=width)
     content.rect(bg_color="#EEEEEE")
     codebox = content.box(p_left=10, p_right=50, p_y=10, z_level=100, x=0)
-    codebox.code(language, code, style=code_style)
-    return codebox
+    return codebox.code(language, code, style=code_style)
 
 
 def with_bg(parent: Box, bg_color="#DDDDDD") -> Box:
@@ -44,12 +43,12 @@ def with_bg(parent: Box, bg_color="#DDDDDD") -> Box:
 
 def bash(parent: Box, code: str, text_style=None, **box_args):
     if text_style is None:
-        text_style = {}
+        text_style = s()
 
-    text_style.update({
-        "color": "#E9E9ED",
-        "font": "monospace",
-    })
+    text_style = text_style.compose(s(
+        color="#E9E9ED",
+        font="monospace"
+    ))
 
     wrapper = parent.box(**box_args)
     wrapper.rect(bg_color="#3F3F3F")

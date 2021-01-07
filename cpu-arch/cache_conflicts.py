@@ -1,10 +1,10 @@
-from elsie import Slides, Arrow
-from elsie.box import Box
+from elsie import Arrow, SlideDeck, TextStyle as s
+from elsie.boxtree.box import Box
 
-from utils import new_slide, slide_header, list_item, COLOR_NOTE, bash, code, COLOR_BACKEND
+from utils import COLOR_BACKEND, COLOR_NOTE, bash, code, list_item, new_slide, slide_header
 
 
-def cache_conflicts(slides: Slides, backup: bool):
+def cache_conflicts(slides: SlideDeck, backup: bool):
     if backup:
         slide = new_slide(slides)
         content = slide_header(slide, "Code (backup)")
@@ -41,14 +41,16 @@ for (auto ptr: data)
         htable = wrapper.box(horizontal=True)
         items = []
         for i in range(size):
-            cell = htable.box(width=dimension, height=dimension, horizontal=True).rect("black", stroke_width=2)
+            cell = htable.box(width=dimension, height=dimension, horizontal=True).rect("black",
+                                                                                       stroke_width=2)
             items.append(cell)
 
         if buckets:
             bucket_width = int((size / buckets) * dimension)
             for i in range(buckets):
                 pos = i * bucket_width
-                htable.box(x=pos, y=0, width=bucket_width, height=dimension).rect("black", stroke_width=6)
+                htable.box(x=pos, y=0, width=bucket_width, height=dimension).rect("black",
+                                                                                  stroke_width=6)
                 if bucket_indices:
                     htable.box(x=pos, y=dimension - 5, width=bucket_width).text(str(i))
 
@@ -74,7 +76,8 @@ for (auto ptr: data)
         padding = 20
         height = 110
         lcol.box(show="next+", p_top=padding, height=height).text(text)
-        return table(rcol.box(show="last+", p_top=padding, height=height), hash_size, hash_dimension, block_count)
+        return table(rcol.box(show="last+", p_top=padding, height=height), hash_size,
+                     hash_dimension, block_count)
 
     htable_row("N = 1 (direct mapped)", hash_size)
     htable_row("N = {} (fully associative)".format(hash_size), 1)
@@ -97,13 +100,13 @@ for (auto ptr: data)
     labelrow.box(p_left=770).text("0")
 
     list_wrapper = content.box(p_top=20)
-    list_item(list_wrapper, show="next+").text("Offset", style={"bold": True})
+    list_item(list_wrapper, show="next+").text("Offset", "bold")
     list_item(list_wrapper, level=1, show="last+").text("Selects byte within a cache line")
     list_item(list_wrapper, level=1, show="last+").text("log2(cache line size) bits")
-    list_item(list_wrapper, show="next+").text("Index", style={"bold": True})
+    list_item(list_wrapper, show="next+").text("Index", "bold")
     list_item(list_wrapper, level=1, show="last+").text("Selects bucket within the cache")
     list_item(list_wrapper, level=1, show="last+").text("log2(bucket count) bits")
-    list_item(list_wrapper, show="next+").text("Tag", style={"bold": True})
+    list_item(list_wrapper, show="next+").text("Tag", "bold")
     list_item(list_wrapper, level=1, show="last+").text("Used for matching")
 
     slide = new_slide(slides)
@@ -114,7 +117,10 @@ for (auto ptr: data)
     colors = ("#F0134D", "#FF6F5E", "#F0134D")
     cacheline_labels = ("A", "B", "C")
     for i in range(3):
-        queue.box(width=hash_dimension, height=hash_dimension).rect(color="black", bg_color=colors[i], stroke_width=5).text(cacheline_labels[i], style={"bold": True, "color": "white"})
+        queue.box(width=hash_dimension, height=hash_dimension).rect(color="black",
+                                                                    bg_color=colors[i],
+                                                                    stroke_width=5).text(
+            cacheline_labels[i], style=s(bold=True, color="white"))
 
     index = content.box(x="55%", y=90, horizontal=True)
     index.box(p_right=75).text("Index bits:")
@@ -125,7 +131,7 @@ for (auto ptr: data)
     def insert(slot, show, item):
         wrapper = slot.overlay(show=show)
         wrapper.rect(bg_color=colors[item])
-        wrapper.text(cacheline_labels[item], style={"bold": True, "color": "white"})
+        wrapper.text(cacheline_labels[item], style=s(bold=True, color="white"))
 
     row = content.box(horizontal=True, p_top=20)
     lcol = row.box(y=0)
@@ -135,7 +141,8 @@ for (auto ptr: data)
         padding = 20
         height = 140
         lcol.box(show="next+", p_top=padding, height=height).text(text)
-        return table(rcol.box(show="last+", p_top=padding, height=height), hash_size, hash_dimension, block_count)
+        return table(rcol.box(show="last+", p_top=padding, height=height), hash_size,
+                     hash_dimension, block_count)
 
     (_, hitems) = htable_row("N = 1", hash_size)
     insert(hitems[0], "next+", 0)
@@ -153,13 +160,13 @@ for (auto ptr: data)
     insert(hitems[1], "next+", 2)
 
     slide = new_slide(slides)
-    slide.update_style("default", size=46)
-    slide.update_style("bold", size=46)
+    slide.update_style("default", s(size=46))
+    slide.update_style("bold", s(size=46))
     content = slide_header(slide, "Intel L1 cache")
     bash(content.box(), """$ getconf -a | grep LEVEL1_DCACHE
 LEVEL1_DCACHE_SIZE      32768
 LEVEL1_DCACHE_ASSOC     8
-LEVEL1_DCACHE_LINESIZE  64""", text_style={"align": "left"})
+LEVEL1_DCACHE_LINESIZE  64""", text_style=s(align="left"))
     list_wrapper = content.box(p_top=20)
     list_item(list_wrapper, show="next+").text("~bold{Cache line size} - 64 B (6 offset bits)")
     list_item(list_wrapper, show="next+").text("~bold{Associativity} (N) - 8")
@@ -167,9 +174,10 @@ LEVEL1_DCACHE_LINESIZE  64""", text_style={"align": "left"})
     list_item(list_wrapper, show="next+").text("32768 / 64 => 512 cache lines")
     list_item(list_wrapper, show="next+").text("512 / 8 => 64 buckets (6 index bits)")
 
-    slides.derive_style("default", "tag", color=address_colors[0])
-    slides.derive_style("tag", "index", color=address_colors[1])
-    slides.derive_style("tag", "offset", color=address_colors[2])
+    slides.set_style("tag", s(color=address_colors[0]))
+    tag = slides.get_style("tag")
+    slides.set_style("index", tag.compose(s(color=address_colors[1])))
+    slides.set_style("offset", tag.compose(s(color=address_colors[2])))
 
     styles = ["tag", "index", "offset"]
     colors = ["#F0134D", "#FF6F5E", "#1F6650", "#40BFC1"]
@@ -183,7 +191,7 @@ LEVEL1_DCACHE_LINESIZE  64""", text_style={"align": "left"})
             style = "default"
             if use_style:
                 if i == 0:
-                    style = {"color": colors[row]}
+                    style = s(color=colors[row])
                 else:
                     style = styles[i - 1]
             col.box(show=show).text(content[i], style=style)
@@ -205,7 +213,8 @@ LEVEL1_DCACHE_LINESIZE  64""", text_style={"align": "left"})
     hash_dimension = 80
     (htable, hitems) = table(content.box(p_top=20), hash_size, hash_dimension, hash_size // 2)
     for i in range(4):
-        hitems[0].box(show="{}+".format(i + 1), width=hash_dimension // 4, height=hash_dimension).rect(bg_color=colors[i])
+        hitems[0].box(show="{}+".format(i + 1), width=hash_dimension // 4,
+                      height=hash_dimension).rect(bg_color=colors[i])
 
     list_wrapper = content.box(p_top=40)
     list_item(list_wrapper, show="next+").text("Same bucket, same cache line for each number")
@@ -225,7 +234,8 @@ LEVEL1_DCACHE_LINESIZE  64""", text_style={"align": "left"})
 
     (htable, hitems) = table(content.box(p_top=20), hash_size, hash_dimension, hash_size // 2)
     for i in range(4):
-        hitems[i * 2].box(show="{}+".format(i + 1), width=hash_dimension // 4, height=hash_dimension, x=0).rect(bg_color=colors[i])
+        hitems[i * 2].box(show="{}+".format(i + 1), width=hash_dimension // 4,
+                          height=hash_dimension, x=0).rect(bg_color=colors[i])
 
     list_wrapper = content.box(p_top=40)
     list_item(list_wrapper, show="next+").text("Different bucket for each number")
@@ -246,18 +256,20 @@ LEVEL1_DCACHE_LINESIZE  64""", text_style={"align": "left"})
 
     (htable, hitems) = table(content.box(p_top=20), hash_size, hash_dimension, hash_size // 2)
     for i in range(4):
-        hitems[i % 2].box(show="{}+".format(i + 1), width=hash_dimension // 4, height=hash_dimension, x=0).rect(bg_color=colors[i])
+        hitems[i % 2].box(show="{}+".format(i + 1), width=hash_dimension // 4,
+                          height=hash_dimension, x=0).rect(bg_color=colors[i])
 
     list_wrapper = content.box(p_top=40)
-    list_item(list_wrapper, show="next+").text("Same bucket, but different cache lines for each number!")
+    list_item(list_wrapper, show="next+").text(
+        "Same bucket, but different cache lines for each number!")
     list_item(list_wrapper, show="next+").text("Bucket full => evictions necessary")
 
     slide = new_slide(slides)
     content = slide_header(slide, "How to measure?")
-    content.box().text("~tt{l1d.replacement}", style={"size": 48})
+    content.box().text("~tt{l1d.replacement}", style=s(size=48))
     content.box(p_top=20).text("How many times was a cache line loaded into L1?")
 
     if backup:
         bash(content.box(p_top=40, show="next+"), """$ perf stat -e l1d.replacement ./example1
 4B    offset ->     149 558
-4096B offset -> 426 218 383""", text_style={"align": "left"})
+4096B offset -> 426 218 383""", text_style=s(align="left"))
