@@ -32,7 +32,7 @@ def intro(slide):
 
 @slides.slide()
 def hpc(slide):
-    slide.image("imgs/hpc.svg", 0.9)
+    slide.image("imgs/hpc.svg", scale=0.9)
 
 
 @slides.slide()
@@ -148,7 +148,7 @@ def problem(slide):
 def aislinn(slide):
     slide = slide_with_title(slide, "Aislinn")
     slide.box().text("http://verif.cs.vsb.cz/aislinn/")
-    slide.box().image("imgs/aislinn.svg", 0.7)
+    slide.box().image("imgs/aislinn.svg", scale=0.7)
 
 
 @slides.slide()
